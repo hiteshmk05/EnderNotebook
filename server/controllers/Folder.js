@@ -3,7 +3,7 @@ const sendResponse=require('../utils/responseHandler');
 
 exports.createFolder=async (req,res)=>{
     try {
-        const userId=req.user._id;
+        const userId=req.user.id;
         const email=req.user.email;
         const {folderName,parentFolderId}=req.body;
 
@@ -42,6 +42,7 @@ exports.createFolder=async (req,res)=>{
         const folderData={
             email,
             folderName,
+            user:userId,
             level,
             parent:parentFolderId || null,
             child:[],

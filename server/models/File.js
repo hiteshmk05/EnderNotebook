@@ -1,47 +1,47 @@
-const mongoose=require("mongoose");
+const mongoose = require('mongoose');
 
-const fileSchema=mongoose.Schema({
+const fileSchema = new mongoose.Schema({
+    user:{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', 
+        required: true 
+    },
+    folder:{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Folder', 
+        default: null 
+    },
     fileName:{
-        type:String,
-        required:true,
+        type: String, 
+        required: true 
     },
-    email:{
-        type:String,
-        required:true,
-    },
-    folder:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Folder",
-        default:null,
-    },
-    fileType: {
-        type: String,
-        required: true,
-        // only pdf would be allowed to uplaod as of now
-    },
-    source: {
-        type: String,
-        enum: ["cloudinary", "inline"],
-        required: true,
+    type:{ 
+        type: String, 
+        enum: ['pdf', 'note'], 
+        required: true 
     },
     
-    cloudinaryId:{
-        type:String,
-    },
-    cloudinaryUrl:{
-        type:String,
-    },
-    content:{
-        type:String,
-    },
+    //only pdf files wpuld be there
+    url:        {type: String },  
+    publicId:   {type: String },  
 
-    sharedWith: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    }],
-    size: {
-        type: Number,
-    },
-});
+    content:    {type: String },      //editable file stored in db 
+    updatedAt:  {type: Date, default: Date.now },
 
-module.exports = mongoose.model("File", fileSchema);
+    sharedWith: [{ 
+        user:{ 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'User' 
+        },
+        permission:{ 
+            type: String, 
+            enum: ['read','write'], 
+            default: 'read' 
+        }
+    }]
+    }, {timestamps: true} //created and updated at
+);
+
+fileSchema.index({ user: 1, folder: 1 }); //added indexes for faster lookups
+
+module.exports = mongoose.model('File', fileSchema);

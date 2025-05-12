@@ -6,6 +6,8 @@ const otpGenerator=require("otp-generator");
 const sendResponse=require("../utils/responseHandler");
 require("dotenv").config();
 
+//simple login signup shit
+
 exports.sendOTP=async (req,res)=>{
     try {
         const {email,firstName,lastName,password,confirmPassword}=req.body;
@@ -112,7 +114,7 @@ exports.login = async (req , res) => {
             });
         }
 
-        const userExists=await User.findOne({email:email}).populate("additionalDetails").populate("categories");
+        const userExists=await User.findOne({email:email})
 
         if(!userExists){
             return res.status(400).json({
