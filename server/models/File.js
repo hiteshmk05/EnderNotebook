@@ -22,13 +22,14 @@ const fileSchema = new mongoose.Schema({
     },
     
     //only pdf files wpuld be there
-    url:        {type: String },  
-    publicId:   {type: String },  
+    url:{ type: String },  
+    publicId:{type: String },  
+    
+    //stored in db 
+    content:{type: String },      
+    updatedAt: {type: Date, default: Date.now },
 
-    content:    {type: String },      //editable file stored in db 
-    updatedAt:  {type: Date, default: Date.now },
-
-    sharedWith: [{ 
+    sharedWith:[{ 
         user:{ 
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'User' 
@@ -43,5 +44,7 @@ const fileSchema = new mongoose.Schema({
 );
 
 fileSchema.index({ user: 1, folder: 1 }); //added indexes for faster lookups
+
+fileSchema.index({user:1, folder:1,fileName:1},{unique:true});
 
 module.exports = mongoose.model('File', fileSchema);

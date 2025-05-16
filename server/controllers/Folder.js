@@ -1,65 +1,52 @@
 const Folder=require("../models/Folder");
 const sendResponse=require('../utils/responseHandler');
 
+/* 
+    controller for creating a folder
+    we take foldername from user 
+    the level will be taken from the parent folder
+    if theres no parent then it means its a root folder and we take level as 1
+*/
+
 exports.createFolder=async (req,res)=>{
     try {
-        const userId=req.user.id;
-        const email=req.user.email;
-        const {folderName,parentFolderId}=req.body;
+        const userID=req.user.id;
+        const {folderName,parentID}=req.body;
 
-        if(!folderName){
-            return sendResponse(res,400,false,"folder name not added");
+        if(!folderName) {
+            return sendResponse(res,400,false,"folder name and level not specified")
         }
+        
+        let currLevel=1;
 
-        const existingFolder=await Folder.findOne({
-            email,
-            folderName,
-            parent:parentFolderId||null
-        });
-
-        if(existingFolder){
-            return sendResponse(res,400,false,"folder with the name already exisits")
-        }
-
-        let level=1;
-
-        if(parentFolderId){
-            const parentFolder=await Folder.findById(parentFolderId);
-
-            if(!parentFolder){
-                return sendResponse(res,404,false,"parent folder not found get rekt");
+        if(parentID) {
+            const parent = await Folder.findOne({ _id: parentID, user: userID });
+            if (!parent) {
+                return sendResponse(res, 404, false, "parent folder not found");
             }
-
-            level=parentFolder.level+1;
-
-            if(level>4){
-                return sendResponse(res,400,false,"maximum depth reached get rekt nub");
-
+            currLevel = parent.level + 1;
+            if (currLevel > 4) {
+                return sendResponse(res, 403, false, "maximum folder depth reached");
             }
-
         }
 
-        const folderData={
-            email,
-            folderName,
-            user:userId,
-            level,
-            parent:parentFolderId || null,
-            child:[],
-            files:[]
-        };
-
-        const newFolder=await Folder.create(folderData);
-
-        if(parentFolderId){
-            await Folder.findByIdAndUpdate(
-                parentFolderId,
-                {$push:{child:newFolder._id}}
-            );
+        const folderPayload = {
+            user:userID,
+            folderName:folderName,
+            level:currLevel,
+            parent:parentID || null,
         }
 
-        return sendResponse(res,200,true,"folder created successfuuly heavy baat cheet");
+        try {
+            const newFolder=await Folder.create(folderPayload);
+            return sendResponse(res,200,true,"folder created successfully", {newFolder});
 
+        } catch (error) {
+            if(error.code===11000){
+                return sendResponse(res,400,false,"folder cannot be created as a same name exists in this directory");
+            }
+            throw error;
+        }
     } catch (error) {
         console.log(error);
         return sendResponse(res,500,false,"internal server error get rekt");
