@@ -1,6 +1,7 @@
 const express=require('express');
 const app = express();
 const database = require("./config/databaseConfig");
+const cloudinary = require("cloudinary").v2;
 const dotenv = require("dotenv");
 const userRoutes=require("./routes/UserRoutes");
 const folderRoutes=require("./routes/FolderRoutes");

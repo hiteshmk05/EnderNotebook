@@ -1,9 +1,11 @@
 const express=require("express");
 const router=express.Router();
 const {auth}=require("../middleware/auth");
-const {uploadFile,createInlineFile}=require("../controllers/File");
+const {uploadFile,createNoteFile}=require("../controllers/File");
+// const multerMemory   = require('../config/multerMemory'); 
+const upload  = require('../config/multerMemory');
 
-router.post("/uploadFile",auth,uploadFile);
-router.post("/createInlineFile",auth,createInlineFile);
+router.post("/uploadFile",auth,upload.single('file'),uploadFile);
+router.post("/createInlineFile",auth,createNoteFile);
 
 module.exports=router;

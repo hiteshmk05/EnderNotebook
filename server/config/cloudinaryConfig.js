@@ -1,7 +1,10 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import multer from 'multer';
-import dotenv from 'dotenv';
+// import { v2 as cloudinary } from 'cloudinary';
+// // import { CloudinaryStorage } from 'multer-storage-cloudinary';
+// // import multer from 'multer';
+// import dotenv from 'dotenv';
+
+const cloudinary = require('cloudinary').v2;
+const dotenv     = require('dotenv');
 
 dotenv.config();
 
@@ -12,14 +15,10 @@ cloudinary.config({
 	secure: true                           
 });
 
+// export default cloudinary;
+module.exports=cloudinary;
 
-const storage = new CloudinaryStorage({
-	cloudinary,
-	params: (req, file) => ({
-		folder: 'endernotebook',               
-		format: file.mimetype.split('/')[1],   
-		public_id: `${Date.now()}-${file.originalname}` 
-	})
-});
 
-export const upload = multer({ storage });
+// const storage = new CloudinaryStorage();
+
+// export const upload = multer({ storage:multer.memoryStorage });
